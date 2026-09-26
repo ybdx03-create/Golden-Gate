@@ -9,6 +9,8 @@
 - 20거래일 가격·거래량·거래대금 대용 지표를 바탕으로 매수 후보/보유 관찰/축소 검토/관망 분류
 - 기준일·근거·반대 근거·무효화 조건을 포함한 분석 실행 기록
 - 추천 후 1·5·20거래일 원시 종가 수익률 사후 검증
+- 시간 순서 보류 구간, 거래 비용, 슬리피지를 반영한 연구용 백테스트
+- 단일 종목·산업 집중도 및 현금 비중 위험 한도
 - 체결 기록, FIFO 원가, 수수료와 체결 환율을 반영한 HKD 실현 손익
 - 최신 일봉 및 환율이 있을 때만 평가 자산 표시; 7일 이상 오래된 데이터로는 평가하지 않음
 - 관찰→가설→결정→결과 일지와 버전 이력을 가진 지식 라이브러리
@@ -45,7 +47,7 @@ Alpha Vantage 일별 API는 최근 100개 일봉의 `compact` 모드를 사용�
 
 ## 명명 및 구조
 
-[명명·설계 표준](docs/standards/naming.md), [아키텍처와 데이터 한계](docs/architecture.md)를 참고하세요.
+[명명·설계 표준](docs/standards/naming.md), [아키텍처와 데이터 한계](docs/architecture.md), [모델과 검증 방법](docs/model.md)을 참고하세요.
 
 - `server/`: Express API, 분석 및 포트폴리오 계산
 - `src/`: React 화면과 디자인 시스템
@@ -55,16 +57,17 @@ Alpha Vantage 일별 API는 최근 100개 일봉의 `compact` 모드를 사용�
 
 ## 주요 API
 
-| 기능                | 경로                                                                                   |
-| ------------------- | -------------------------------------------------------------------------------------- |
-| 상태·대시보드       | `GET /api/v1/health`, `GET /api/v1/dashboard`                                          |
-| 종목·일봉·재무·환율 | `POST /api/v1/instruments`, `/price-bars/import`, `/fundamentals`, `/fx-rates`         |
-| 과거 일봉 동기화    | `POST /api/v1/data/sync`                                                               |
-| 분석·추천           | `POST /api/v1/analysis-runs`, `GET /api/v1/recommendations`                            |
-| 추천 사후 검증      | `POST /api/v1/recommendation-outcomes/evaluate`, `GET /api/v1/recommendation-outcomes` |
-| 거래·포트폴리오     | `POST /api/v1/trades`, `GET /api/v1/trades`, `/portfolio`                              |
-| 투자 일지           | `GET/POST /api/v1/journal-entries`, `PATCH /api/v1/journal-entries/:id`                |
-| 지식                | `GET/POST /api/v1/knowledge-entries`, `PATCH /api/v1/knowledge-entries/:id`            |
+| 기능                | 경로                                                                                                                      |
+| ------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| 상태·대시보드       | `GET /api/v1/health`, `GET /api/v1/dashboard`                                                                             |
+| 종목·일봉·재무·환율 | `POST /api/v1/instruments`, `/price-bars/import`, `/fundamentals`, `/fx-rates`                                            |
+| 과거 일봉 동기화    | `POST /api/v1/data/sync`                                                                                                  |
+| 분석·추천           | `POST /api/v1/analysis-runs`, `GET /api/v1/recommendations`                                                               |
+| 백테스트·위험 한도  | `GET /api/v1/backtest-runs/latest`, `POST /api/v1/backtest-runs`, `GET /api/v1/risk-dashboard`, `PUT /api/v1/risk-policy` |
+| 추천 사후 검증      | `POST /api/v1/recommendation-outcomes/evaluate`, `GET /api/v1/recommendation-outcomes`                                    |
+| 거래·포트폴리오     | `POST /api/v1/trades`, `GET /api/v1/trades`, `/portfolio`                                                                 |
+| 투자 일지           | `GET/POST /api/v1/journal-entries`, `PATCH /api/v1/journal-entries/:id`                                                   |
+| 지식                | `GET/POST /api/v1/knowledge-entries`, `PATCH /api/v1/knowledge-entries/:id`                                               |
 
 ## 검증
 
@@ -82,4 +85,4 @@ npm run test:integration
 
 거래 달력은 통상 NYSE 휴장일 규칙을 계산하지만 임시 휴장과 조기 폐장을 자동 반영하지 못합니다. 정규 개장 시각은 NYSE 기준 09:30 ET이며 중국 시간으로 미국 서머타임 중 21:30, 표준시 중 22:30입니다. [NYSE 거래 시간 및 휴장일](https://www.nyse.com/trade/hours-calendars)
 
-실전 운용 전에는 라이선스가 맞는 실시간 데이터, 공식 캘린더, 기업 공시의 시점별 수집, 배당·분할 조정, 거래 비용을 포함한 백테스트와 워크포워드 검증, 위험 한도, 계좌·사용자 인증을 추가해야 합니다. 현재 서버는 `127.0.0.1`에만 바인딩됩니다. 50,000 HKD → 5,000,000 HKD 목표는 추적용이며 분석 점수나 위험 한도를 높이는 데 쓰지 않습니다.
+실전 운용 전에는 라이선스가 맞는 실시간 데이터, 공식 캘린더, 기업 공시의 시점별 수집, 배당·분할 조정, 거래 비용을 포함한 백테스트와 워크포워드 검증, 일일 평가 자산 스냅샷을 이용한 손실·낙폭 측정, 계좌·사용자 인증을 추가해야 합니다. 현재 서버는 `127.0.0.1`에만 바인딩됩니다. 50,000 HKD → 5,000,000 HKD 목표는 추적용이며 분석 점수나 위험 한도를 높이는 데 쓰지 않습니다.

@@ -8,6 +8,9 @@ import { getPortfolio } from './portfolio.js';
 import { isTradingDay, marketSchedule } from './market-calendar.js';
 import { syncAlphaVantage } from './provider.js';
 import { registerExtraRoutes } from './extra-routes.js';
+import { registerRiskRoutes } from './risk.js';
+import { registerBacktestRoutes } from './backtest-routes.js';
+import { evaluateRecommendationOutcomes } from './outcomes.js';
 
 const app = express();
 app.disable('x-powered-by');
@@ -367,6 +370,8 @@ app.post(
   }),
 );
 registerExtraRoutes(app);
+registerRiskRoutes(app);
+registerBacktestRoutes(app);
 const handleError: ErrorRequestHandler = (error, _req, res, _next) => {
   if (error instanceof ZodError) {
     res.status(400).json({
@@ -399,7 +404,8 @@ let scheduledDate = '';
 setInterval(async () => {
   const ny = DateTime.now().setZone('America/New_York');
   const date = ny.toISODate()!;
-  if (!isTradingDay(ny) || ny.hour !== 8 || ny.minute !== 45 || scheduledDate === date) return;
+  const minuteOfDay = ny.hour * 60 + ny.minute;
+  if (!isTradingDay(ny) || minuteOfDay < 525 || minuteOfDay > 555 || scheduledDate === date) return;
   scheduledDate = date;
   try {
     const prior = await query<{ count: number }>(
@@ -420,9 +426,15 @@ setInterval(async () => {
           await new Promise((resolve) => setTimeout(resolve, 13_000));
         }
       }
+      try {
+        await evaluateRecommendationOutcomes();
+      } catch (error) {
+        console.error('Outcome evaluation failed', error);
+      }
       await runAnalysis(date);
     }
   } catch (error) {
+    scheduledDate = '';
     console.error('Scheduled analysis failed', error);
   }
 }, 60_000);

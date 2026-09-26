@@ -1460,3 +1460,154 @@ tbody tr:last-child td {
     margin-top: 15px;
   }
 }
+.validation-meta {
+  font-size: 10px;
+  color: #9aa7b6;
+  margin: 18px 0 12px;
+}
+.validation-empty {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  background: #fff5e6;
+  color: #936e36;
+  padding: 16px;
+  border-radius: 8px;
+  margin-top: 18px;
+  font-size: 11px;
+}
+.validation-metrics {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  margin-top: 16px;
+}
+.validation-metrics > div,
+.risk-grid > div {
+  border: 1px solid #e9edf2;
+  background: #fafbfc;
+  border-radius: 8px;
+  padding: 13px;
+}
+.validation-metrics span,
+.risk-grid span {
+  display: block;
+  color: #8c9aab;
+  font-size: 9px;
+}
+.validation-metrics strong,
+.risk-grid strong {
+  display: block;
+  color: #23354a;
+  font-size: 15px;
+  margin-top: 8px;
+}
+.validation-split {
+  display: flex;
+  align-items: center;
+  justify-content: space-evenly;
+  margin: 17px 0;
+  padding: 15px;
+  background: #f6f8fa;
+  border-radius: 8px;
+}
+.validation-split > div {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.validation-split span {
+  font-size: 9px;
+  color: #9aa7b6;
+}
+.validation-split strong {
+  font-size: 13px;
+  color: #26384d;
+}
+.validation-split small {
+  font-size: 9px;
+  color: #8f9daf;
+}
+.validation-split > svg {
+  color: #c2a474;
+}
+.limitation-list {
+  margin: 14px 0;
+  padding: 14px 14px 14px 29px;
+  background: #f9f3e9;
+  border-radius: 8px;
+  color: #8f7046;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.risk-clear,
+.risk-flags > div {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: 7px;
+  padding: 12px;
+  font-size: 10px;
+  margin-top: 15px;
+}
+.risk-clear {
+  background: #edf8f1;
+  color: #298162;
+}
+.risk-flags > div {
+  background: #fff0ec;
+  color: #b65552;
+}
+.risk-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 9px;
+  margin-top: 15px;
+}
+.risk-note {
+  color: #a0a9b4;
+  font-size: 10px;
+  line-height: 1.7;
+}
+.risk-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 17px;
+  padding: 16px;
+  background: #f8fafb;
+  border-radius: 8px;
+}
+.risk-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  font-size: 10px;
+  color: #69798d;
+  font-weight: 700;
+}
+.risk-form input {
+  border: 1px solid #dfe5eb;
+  border-radius: 6px;
+  padding: 10px;
+  min-width: 0;
+}
+.risk-form .primary-button {
+  align-self: flex-end;
+}
+@media (max-width: 900px) {
+  .validation-metrics,
+  .risk-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 620px) {
+  .validation-metrics,
+  .risk-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .validation-split {
+    gap: 9px;
+    padding: 12px;
+  }
+}

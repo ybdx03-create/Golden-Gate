@@ -31,7 +31,11 @@ try {
   const client = new pg.Client({ connectionString: testUrl.toString() });
   try {
     await client.connect();
-    for (const name of ['0001_initial.sql', '0002_learning_loop.sql'])
+    for (const name of [
+      '0001_initial.sql',
+      '0002_learning_loop.sql',
+      '0003_validation_and_risk.sql',
+    ])
       await client.query(
         await readFile(new URL(`../db/migrations/${name}`, import.meta.url), 'utf8'),
       );
@@ -61,8 +65,8 @@ try {
     sectorName: 'Test Sector',
   });
   const bars = [];
-  let date = new Date('2026-08-17T12:00:00Z');
-  while (bars.length < 22) {
+  let date = new Date('2026-05-04T12:00:00Z');
+  while (bars.length < 80) {
     const day = date.getUTCDay();
     if (day !== 0 && day !== 6) {
       const n = bars.length;
@@ -73,7 +77,7 @@ try {
         highAmount: 102 + n,
         lowAmount: 99 + n,
         closeAmount: 101 + n,
-        volumeShares: 1000 + n * 10,
+        volumeShares: 1000000 + n * 10000,
       });
     }
     date = new Date(date.getTime() + 86400000);
@@ -89,6 +93,16 @@ try {
   });
   const analysis = await request('/analysis-runs', 'POST', {});
   assert.equal(analysis.count, 1);
+  const backtest = await request('/backtest-runs', 'POST', {});
+  assert.equal(backtest.status, 'COMPLETED');
+  assert.ok(backtest.trades.length > 0);
+  const risk = await request('/risk-dashboard');
+  assert.equal(risk.policy.maxSinglePositionPct, 20);
+  const updatedRisk = await request('/risk-policy', 'PUT', {
+    ...risk.policy,
+    maxSinglePositionPct: 15,
+  });
+  assert.equal(updatedRisk.policy.maxSinglePositionPct, 15);
   const recommendations = await request('/recommendations');
   assert.equal(recommendations.length, 1);
   assert.notEqual(recommendations[0].actionCode, 'INSUFFICIENT_DATA');

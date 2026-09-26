@@ -26,6 +26,7 @@ import {
   X,
 } from 'lucide-react';
 import './styles.css';
+import { ValidationPanel, RiskPanel } from './components/validation';
 import {
   RecommendationOutcomes,
   FundamentalsForm,
@@ -718,6 +719,7 @@ function App() {
                 )}
               </section>
               <RecommendationOutcomes />
+              <ValidationPanel />
             </>
           )}
           {tab === 'portfolio' && (
@@ -800,6 +802,7 @@ function App() {
                   onSubmit={(v) => void submit('/trades', v, '체결을 기록했습니다.')}
                 />
               </div>
+              <RiskPanel />
               <section className="panel spaced-panel">
                 <PanelHead kicker="EXECUTION HISTORY" title="거래 이력" />
                 {trades.length ? (
